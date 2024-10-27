@@ -15,6 +15,10 @@ Computes autocorrelation using Wiener-Khinchin theorem
 2. Power spectrum (square coeff)
 3. Inverse FFT
 4. Discard complex component
+
+https://en.wikipedia.org/wiki/Fast_Fourier_transform#FFT_algorithms_specialized_for_real_or_symmetric_data
+Evaluate if such an algorithm could be used here, or maybe already is. FFTReal() kind of suggests this, but double check
+Benchmark each of "real->half size complex", "Sorensen, 1987 or similar" and the "removing redundant parts" algortihms. Ask an expert (katjaas?)
 */
 func OptimizedAutocorrelation(buf *audio.IntBuffer) []float64 {
 
