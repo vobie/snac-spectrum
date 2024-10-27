@@ -21,7 +21,6 @@ Evaluate if such an algorithm could be used here, or maybe already is. FFTReal()
 Benchmark each of "real->half size complex", "Sorensen, 1987 or similar" and the "removing redundant parts" algortihms. Ask an expert (katjaas?)
 */
 func OptimizedAutocorrelation(buf *audio.IntBuffer) []float64 {
-
 	// ATTN: This may be an issue for SNAC when choosing window size, resampling may be needed
 	// Could implement automatic resampling for convenience here, but always warn as time is of the essence
 	n := buf.NumFrames()
@@ -29,7 +28,6 @@ func OptimizedAutocorrelation(buf *audio.IntBuffer) []float64 {
 		fmt.Printf("FFT WARNING: Frame size (%d) not power of 2\n", n)
 	}
 
-	// ATTN: FFT is WAY slower if frame size not divisible by 2
 	fftResult := fft.FFTReal(utils.BufferToFloat64(buf))
 
 	// FIXME: Optimize this step
@@ -49,7 +47,6 @@ func OptimizedAutocorrelation(buf *audio.IntBuffer) []float64 {
 }
 
 func OptimizedAutocorrelationNorm(buf *audio.IntBuffer) []float64 {
-
 	// ATTN: This may be an issue for SNAC when choosing window size, resampling may be needed
 	// Could implement automatic resampling for convenience here, but always warn as time is of the essence
 	n := buf.NumFrames()
@@ -57,7 +54,6 @@ func OptimizedAutocorrelationNorm(buf *audio.IntBuffer) []float64 {
 		fmt.Printf("FFT WARNING: Frame size (%d) not power of 2\n", n)
 	}
 
-	// ATTN: FFT is WAY slower if frame size not divisible by 2
 	fftResult := fft.FFTReal(utils.BufferToFloat64(buf))
 
 	// FIXME: Optimize this step
