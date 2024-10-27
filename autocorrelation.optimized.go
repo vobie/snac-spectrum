@@ -54,20 +54,37 @@ func OptimizedAutocorrelationNorm(buf *audio.IntBuffer) []float64 {
 		fmt.Printf("FFT WARNING: Frame size (%d) not power of 2\n", n)
 	}
 
-	fftResult := fft.FFTReal(utils.BufferToFloat64(buf))
-
-	// FIXME: Optimize this step
-	powerSpectrum := make([]complex128, len(fftResult))
-	for i, val := range fftResult {
-		powerSpectrum[i] = complex(real(val)*real(val)+imag(val)*imag(val), 0)
-	}
-
+	frequencySpectrum := fft.FFTReal(utils.BufferToFloat64(buf))
+	powerSpectrum := utils.PowerSpectrum(frequencySpectrum)
 	autocorr := fft.IFFT(powerSpectrum)
+	averagePower := utils.AveragePowerFromSpectrum(powerSpectrum)
 
-	power := utils.TotalPower(buf)
 	autocorrReal := make([]float64, len(autocorr))
 	for i, val := range autocorr {
-		autocorrReal[i] = real(val) / power
+		autocorrReal[i] = real(val) / averagePower
+	}
+
+	return autocorrReal
+}
+
+func OptimizedAutocorrelationNorm2(buf *audio.IntBuffer) []float64 {
+	// ATTN: This may be an issue for SNAC when choosing window size, resampling may be needed
+	// Could implement automatic resampling for convenience here, but always warn as time is of the essence
+	n := buf.NumFrames()
+	if n > 0 && (n&(n-1)) != 0 {
+		fmt.Printf("FFT WARNING: Frame size (%d) not power of 2\n", n)
+	}
+
+	frequencySpectrum := fft.FFTReal(utils.BufferToFloat64(buf))
+	powerSpectrum := utils.PowerSpectrum(frequencySpectrum)
+	autocorr := fft.IFFT(powerSpectrum)
+	averagePowers := utils.CumulativeAveragePowerPerSample(buf) //1st nan
+
+	fmt.Print(averagePowers)
+
+	autocorrReal := make([]float64, len(autocorr))
+	for i, val := range autocorr {
+		autocorrReal[i] = real(val) / averagePowers[i]
 	}
 
 	return autocorrReal

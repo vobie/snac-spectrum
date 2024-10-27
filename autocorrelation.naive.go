@@ -31,18 +31,16 @@ func NaiveAutocorrelationNorm(buf *audio.IntBuffer) []float64 {
 
 	result := make([]float64, n)
 	slen := len(samples)
-	cumulativePower := utils.CumulativePower(buf)
+	cumulativePowers := utils.CumulativeTotalPower(buf)
 
 	for shift := 0; shift < n; shift++ {
+		power := cumulativePowers[n-shift-1]
+
 		var sum float64
-		var power float64 = cumulativePower[n-shift-1]
-		//var powerCalc float64
 		for i := 0; i < slen-shift; i++ {
 			sum += samples[i] * samples[i+shift]
-			//powerCalc += samples[i] * samples[i]
 		}
 
-		//fmt.Printf("P=%f, PC=%f \n\n", power, powerCalc)
 		if power != 0 {
 			result[shift] = (sum / power)
 		} else {

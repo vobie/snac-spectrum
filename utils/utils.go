@@ -65,7 +65,18 @@ func SliceBuffer(existingBuffer *audio.IntBuffer, N int) *audio.IntBuffer {
 	return newBuffer
 }
 
-func CumulativePower(buf *audio.IntBuffer) []float64 {
+func PowerSpectrum(frequencySpectrum []complex128) []complex128 {
+	powerSpectrum := make([]complex128, len(frequencySpectrum))
+	for i, val := range frequencySpectrum {
+		powerSpectrum[i] = complex(real(val)*real(val)+imag(val)*imag(val), 0)
+	}
+	return powerSpectrum
+}
+
+/*
+Produces a series where cumulativeTotalPower[n] is the cumulative power in the input signal from input[0:n]
+*/
+func CumulativeTotalPower(buf *audio.IntBuffer) []float64 {
 	cumulativePower := make([]float64, buf.NumFrames())
 	data := buf.Data
 	prev := float64(0)
@@ -77,10 +88,50 @@ func CumulativePower(buf *audio.IntBuffer) []float64 {
 	return cumulativePower
 }
 
+func CumulativeAveragePowerPerSample(buf *audio.IntBuffer) []float64 {
+	cumulativePowerPS := make([]float64, buf.NumFrames())
+	data := buf.Data
+	prev := float64(0)
+	for i, sample := range data {
+		power := prev + float64(sample)*float64(sample)
+		cumulativePowerPS[i] = power
+		prev = power
+	}
+	for i, _ := range cumulativePowerPS {
+		cumulativePowerPS[i] /= float64(i)
+	}
+	return cumulativePowerPS
+}
+
 func TotalPower(buf *audio.IntBuffer) float64 {
 	var totalPower float64
 	for _, sample := range buf.Data {
 		totalPower += float64(sample * sample)
 	}
+	return totalPower
+}
+
+/*
+Unsure if appropriately named. Normalizes autocorrelation computed via power spectrum properly to (-1,1)
+*/
+func AveragePowerFromSpectrum(powerSpectrum []complex128) float64 {
+	return TotalPowerFromSpectrum(powerSpectrum) / float64(len(powerSpectrum))
+}
+
+/*
+Unsure if appropriately named
+*/
+func TotalPowerFromSpectrum(powerSpectrum []complex128) float64 {
+	var totalPower float64
+	totalPower += real(powerSpectrum[0])
+
+	for i := 1; i < len(powerSpectrum)/2; i++ {
+		totalPower += 2 * real(powerSpectrum[i])
+	}
+
+	if len(powerSpectrum)%2 == 0 {
+		totalPower += real(powerSpectrum[len(powerSpectrum)/2])
+	}
+
 	return totalPower
 }

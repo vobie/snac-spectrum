@@ -63,7 +63,7 @@ func main() {
 	fmt.Println(utils.NormalizeArray(OptimizedAutocorrelation(utils.MakeBuffer(squareSignal))))
 
 	// WAV stuff
-	file, err := os.Open("440hz.wav")
+	file, err := os.Open("uneven_8192.wav")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
@@ -77,7 +77,7 @@ func main() {
 		return
 	}
 
-	slicedBuffer := utils.SliceBuffer(fullBuffer, 4096) //About 40 full cycles of A440
+	slicedBuffer := utils.SliceBuffer(fullBuffer, 2048) //About 40 full cycles of A440
 
 	fmt.Println()
 	fmt.Println()
@@ -85,10 +85,13 @@ func main() {
 	fmt.Printf("Buffer size: %d \n", slicedBuffer.NumFrames())
 
 	start := time.Now()
-	naive := NaiveAutocorrelationNorm(slicedBuffer)[:4000] // Skip very small shifts, error too big
+	naive := NaiveAutocorrelationNorm(slicedBuffer)[:2048] // Skip very small shifts, error too big. TODO investigate what happens here.
 	fmt.Printf("Naive: %v\n", time.Since(start))
 
 	start2 := time.Now()
+
+	//NORM2
+
 	opti := OptimizedAutocorrelationNorm(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
 	fmt.Printf("Optimized: %v\n", time.Since(start2))
 
