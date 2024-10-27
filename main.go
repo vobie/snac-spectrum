@@ -92,15 +92,9 @@ func main() {
 	opti := OptimizedAutocorrelationNorm(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
 	fmt.Printf("Optimized: %v\n", time.Since(start))
 
-	start = time.Now()
-	opti2 := OptimizedAutocorrelationNorm2(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
-	fmt.Printf("Optimized2: %v\n", time.Since(start))
 	naivePlot := plotAutocorrelation(naive, "Naive autocorrelation")
 	naivePlot.Save(4*vg.Inch, 4*vg.Inch, "naive.png")
 
-	optiPlot := plotAutocorrelation(opti[1:], "Optimized autocorrelation")
+	optiPlot := plotAutocorrelation(opti, "Optimized autocorrelation")
 	optiPlot.Save(4*vg.Inch, 4*vg.Inch, "optimized.png")
-
-	opti2Plot := plotAutocorrelation(opti2[1000:], "Optimized2 autocorrelation") // Works somewhat
-	opti2Plot.Save(4*vg.Inch, 4*vg.Inch, "optimized2.png")
 }

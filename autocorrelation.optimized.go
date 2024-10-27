@@ -67,6 +67,7 @@ func OptimizedAutocorrelationNorm(buf *audio.IntBuffer) []float64 {
 	return autocorrReal
 }
 
+// Failed experiment - The weird effects are from using the power spectrum to calculate autocorrelation, NOT from the average power calc
 func OptimizedAutocorrelationNorm2(buf *audio.IntBuffer) []float64 {
 	// ATTN: This may be an issue for SNAC when choosing window size, resampling may be needed
 	// Could implement automatic resampling for convenience here, but always warn as time is of the essence
