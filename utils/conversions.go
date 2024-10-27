@@ -51,3 +51,16 @@ func NormalizeArray(arr []float64) []float64 {
 
 	return normalized
 }
+
+func SliceBuffer(existingBuffer *audio.IntBuffer, N int) *audio.IntBuffer {
+	if N > len(existingBuffer.Data) {
+		N = len(existingBuffer.Data)
+	}
+
+	newBuffer := &audio.IntBuffer{
+		Data:   existingBuffer.Data[:N],
+		Format: existingBuffer.Format,
+	}
+
+	return newBuffer
+}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"time"
 
 	//"github.com/go-audio/wav"
 	"github.com/go-audio/wav"
@@ -22,7 +23,7 @@ func plotAutocorrelation(correlation []float64, title string) *plot.Plot {
 	p.X.Label.Text = "Shift"
 	p.Y.Label.Text = "Autocorrelation Value"
 
-	data := make(plotter.XYs, 2000)
+	data := make(plotter.XYs, len(correlation))
 	for i := range correlation {
 		data[i] = plotter.XY{X: float64(i), Y: correlation[i]}
 	}
@@ -74,17 +75,22 @@ func main() {
 		return
 	}
 
-	// Plots
-	naive := utils.NormalizeArray(NaiveAutocorrelation(fullBuffer, 200))
-	opti := utils.NormalizeArray(OptimizedAutocorrelation(fullBuffer)[:200])
-	fmt.Printf("[naive] 440hz autocorrelation:")
-	fmt.Println(naive)
-	fmt.Printf("[optimized] 440hz autocorrelation:")
-	fmt.Println(opti)
+	slicedBuffer := utils.SliceBuffer(fullBuffer, 4096) //About 40 full cycles of A440
 
-	naivePlot := plotAutocorrelation(naive, "Naive autocorrelation")
+	start := time.Now()
+	naive := NaiveAutocorrelation(slicedBuffer, 200) // This is not a fair comparison as it only checks 200 offsets
+	fmt.Printf("Naive autocorrelation took %v\n", time.Since(start))
+
+	start2 := time.Now()
+	opti := OptimizedAutocorrelation(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
+	fmt.Printf("Optimized autocorrelation took %v\n", time.Since(start2))
+
+	naiveNorm := utils.NormalizeArray(naive)
+	optiNorm := utils.NormalizeArray(opti[:200])
+
+	naivePlot := plotAutocorrelation(naiveNorm, "Naive autocorrelation")
 	naivePlot.Save(4*vg.Inch, 4*vg.Inch, "naive.png")
 
-	optiPlot := plotAutocorrelation(opti, "Optimized autocorrelation")
+	optiPlot := plotAutocorrelation(optiNorm, "Optimized autocorrelation")
 	optiPlot.Save(4*vg.Inch, 4*vg.Inch, "optimized.png")
 }
