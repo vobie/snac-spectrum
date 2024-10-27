@@ -64,3 +64,23 @@ func SliceBuffer(existingBuffer *audio.IntBuffer, N int) *audio.IntBuffer {
 
 	return newBuffer
 }
+
+func CumulativePower(buf *audio.IntBuffer) []float64 {
+	cumulativePower := make([]float64, buf.NumFrames())
+	data := buf.Data
+	prev := float64(0)
+	for i, sample := range data {
+		power := prev + float64(sample)*float64(sample)
+		cumulativePower[i] = power
+		prev = power
+	}
+	return cumulativePower
+}
+
+func TotalPower(buf *audio.IntBuffer) float64 {
+	var totalPower float64
+	for _, sample := range buf.Data {
+		totalPower += float64(sample * sample)
+	}
+	return totalPower
+}

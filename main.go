@@ -22,6 +22,8 @@ func plotAutocorrelation(correlation []float64, title string) *plot.Plot {
 	p.Title.Text = title
 	p.X.Label.Text = "Shift"
 	p.Y.Label.Text = "Autocorrelation Value"
+	p.Y.Max = 1
+	p.Y.Min = -1
 
 	data := make(plotter.XYs, len(correlation))
 	for i := range correlation {
@@ -83,19 +85,16 @@ func main() {
 	fmt.Printf("Buffer size: %d \n", slicedBuffer.NumFrames())
 
 	start := time.Now()
-	naive := NaiveAutocorrelation(slicedBuffer)
+	naive := NaiveAutocorrelationNorm(slicedBuffer)[:4000] // Skip very small shifts, error too big
 	fmt.Printf("Naive: %v\n", time.Since(start))
 
 	start2 := time.Now()
-	opti := OptimizedAutocorrelation(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
+	opti := OptimizedAutocorrelationNorm(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
 	fmt.Printf("Optimized: %v\n", time.Since(start2))
 
-	naiveNorm := utils.NormalizeArray(naive)
-	optiNorm := utils.NormalizeArray(opti)
-
-	naivePlot := plotAutocorrelation(naiveNorm, "Naive autocorrelation")
+	naivePlot := plotAutocorrelation(naive, "Naive autocorrelation")
 	naivePlot.Save(4*vg.Inch, 4*vg.Inch, "naive.png")
 
-	optiPlot := plotAutocorrelation(optiNorm, "Optimized autocorrelation")
+	optiPlot := plotAutocorrelation(opti, "Optimized autocorrelation")
 	optiPlot.Save(4*vg.Inch, 4*vg.Inch, "optimized.png")
 }
