@@ -22,7 +22,7 @@ func OptimizedAutocorrelation(buf *audio.IntBuffer) []float64 {
 	// Could implement automatic resampling for convenience here, but always warn as time is of the essence
 	n := buf.NumFrames()
 	if n > 0 && (n&(n-1)) != 0 {
-		fmt.Printf("FFT WARNING: Frame size not power of 2\n")
+		fmt.Printf("FFT WARNING: Frame size (%d) not power of 2\n", n)
 	}
 
 	// ATTN: FFT is WAY slower if frame size not divisible by 2

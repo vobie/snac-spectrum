@@ -50,14 +50,14 @@ func main() {
 	// fmt.Println(NaiveAutocorrelation(utils.MakeBuffer([]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), 3))
 	// fmt.Printf("[naive] Ones autocorrelation:")
 	// fmt.Println(NaiveAutocorrelation(utils.MakeBuffer([]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}), 3))
-	fmt.Printf("[naive] Square(2samples) autocorrelation:")
-	fmt.Println(utils.NormalizeArray(NaiveAutocorrelation(utils.MakeBuffer(squareSignal), 3)))
+	fmt.Printf("[naive] Square(2samples) autocorrelation: \n")
+	fmt.Println(utils.NormalizeArray(NaiveAutocorrelation(utils.MakeBuffer(squareSignal))))
 
 	// fmt.Printf("[optimized] Zeroes autocorrelation:")
 	// fmt.Println(OptimizedAutocorrelation(utils.MakeBuffer([]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0})))
 	// fmt.Printf("[optimized] Ones autocorrelation:")
 	// fmt.Println(OptimizedAutocorrelation(utils.MakeBuffer([]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1})))
-	fmt.Printf("[optimized] Square(2samples) autocorrelation:")
+	fmt.Printf("[optimized] Square(2samples) autocorrelation: \n")
 	fmt.Println(utils.NormalizeArray(OptimizedAutocorrelation(utils.MakeBuffer(squareSignal))))
 
 	// WAV stuff
@@ -77,13 +77,18 @@ func main() {
 
 	slicedBuffer := utils.SliceBuffer(fullBuffer, 4096) //About 40 full cycles of A440
 
+	fmt.Println()
+	fmt.Println()
+	fmt.Printf("***** A440 TEST ***** \n")
+	fmt.Printf("Buffer size: %d \n", slicedBuffer.NumFrames())
+
 	start := time.Now()
-	naive := NaiveAutocorrelation(slicedBuffer, 200) // This is not a fair comparison as it only checks 200 offsets
-	fmt.Printf("Naive autocorrelation took %v\n", time.Since(start))
+	naive := NaiveAutocorrelation(slicedBuffer)
+	fmt.Printf("Naive: %v\n", time.Since(start))
 
 	start2 := time.Now()
 	opti := OptimizedAutocorrelation(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
-	fmt.Printf("Optimized autocorrelation took %v\n", time.Since(start2))
+	fmt.Printf("Optimized: %v\n", time.Since(start2))
 
 	naiveNorm := utils.NormalizeArray(naive)
 	optiNorm := utils.NormalizeArray(opti[:200])
