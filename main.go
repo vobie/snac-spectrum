@@ -77,7 +77,7 @@ func main() {
 		return
 	}
 
-	slicedBuffer := utils.SliceBuffer(fullBuffer, 2048) //About 40 full cycles of A440
+	slicedBuffer := utils.SliceBuffer(fullBuffer, 8192) //About 40 full cycles of A440
 
 	fmt.Println()
 	fmt.Println()
@@ -85,19 +85,22 @@ func main() {
 	fmt.Printf("Buffer size: %d \n", slicedBuffer.NumFrames())
 
 	start := time.Now()
-	naive := NaiveAutocorrelationNorm(slicedBuffer)[:2048] // Skip very small shifts, error too big. TODO investigate what happens here.
+	naive := NaiveAutocorrelationNorm(slicedBuffer)[:8100] // Skip very small shifts, error too big. TODO investigate what happens here.
 	fmt.Printf("Naive: %v\n", time.Since(start))
 
-	start2 := time.Now()
-
-	//NORM2
-
+	start = time.Now()
 	opti := OptimizedAutocorrelationNorm(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
-	fmt.Printf("Optimized: %v\n", time.Since(start2))
+	fmt.Printf("Optimized: %v\n", time.Since(start))
 
+	start = time.Now()
+	opti2 := OptimizedAutocorrelationNorm2(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
+	fmt.Printf("Optimized2: %v\n", time.Since(start))
 	naivePlot := plotAutocorrelation(naive, "Naive autocorrelation")
 	naivePlot.Save(4*vg.Inch, 4*vg.Inch, "naive.png")
 
-	optiPlot := plotAutocorrelation(opti, "Optimized autocorrelation")
+	optiPlot := plotAutocorrelation(opti[1:], "Optimized autocorrelation")
 	optiPlot.Save(4*vg.Inch, 4*vg.Inch, "optimized.png")
+
+	opti2Plot := plotAutocorrelation(opti2[1000:], "Optimized2 autocorrelation") // Works somewhat
+	opti2Plot.Save(4*vg.Inch, 4*vg.Inch, "optimized2.png")
 }

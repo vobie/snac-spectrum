@@ -98,7 +98,11 @@ func CumulativeAveragePowerPerSample(buf *audio.IntBuffer) []float64 {
 		prev = power
 	}
 	for i, _ := range cumulativePowerPS {
-		cumulativePowerPS[i] /= float64(i)
+		if cumulativePowerPS[i] == 0 {
+			cumulativePowerPS[i] = 1
+		} else {
+			cumulativePowerPS[i] /= float64(i)
+		}
 	}
 	return cumulativePowerPS
 }
