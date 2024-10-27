@@ -18,8 +18,10 @@ func NaiveAutocorrelation(buf *audio.IntBuffer) []float64 {
 		for i := 0; i < slen-shift; i++ {
 			sum += samples[i] * samples[i+shift]
 		}
-		result[shift] = sum
+		result[shift] = sum / float64(slen-shift) // Unbias: Divide by number of samples multiplied so that it's autocorrelation per sample investigated
 	}
+
+	// FIXME: Divide by total power? We should make this fully comparable to optimized version without lazy normalization later
 
 	return result
 }
