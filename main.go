@@ -91,7 +91,7 @@ func main() {
 	fmt.Printf("Optimized: %v\n", time.Since(start2))
 
 	naiveNorm := utils.NormalizeArray(naive)
-	optiNorm := utils.NormalizeArray(opti[:200])
+	optiNorm := utils.NormalizeArray(opti)
 
 	naivePlot := plotAutocorrelation(naiveNorm, "Naive autocorrelation")
 	naivePlot.Save(4*vg.Inch, 4*vg.Inch, "naive.png")
