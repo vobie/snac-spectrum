@@ -77,7 +77,8 @@ func main() {
 		return
 	}
 
-	slicedBuffer := utils.SliceBuffer(fullBuffer, 8192) //About 40 full cycles of A440
+	slicedBuffer := utils.SliceBuffer(fullBuffer, 8196) //About 40 full cycles of A440
+	slicedBuffer = utils.SnacPadBuffer(slicedBuffer)
 
 	fmt.Println()
 	fmt.Println()

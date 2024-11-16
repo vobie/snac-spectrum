@@ -13,6 +13,20 @@ func BufferToFloat64(buf *audio.IntBuffer) []float64 {
 	return fSamples
 }
 
+func Float64ToBuffer(fSamples []float64) *audio.IntBuffer {
+	samples := make([]int, len(fSamples))
+	for i, fSample := range fSamples {
+		samples[i] = int(fSample)
+	}
+	return &audio.IntBuffer{
+		Data: samples,
+		Format: &audio.Format{
+			SampleRate:  44100,
+			NumChannels: 1,
+		},
+	}
+}
+
 func MakeBuffer(samples []int) *audio.IntBuffer {
 	return &audio.IntBuffer{
 		Format: &audio.Format{SampleRate: 44000, NumChannels: 1},
@@ -138,4 +152,19 @@ func TotalPowerFromSpectrum(powerSpectrum []complex128) float64 {
 	}
 
 	return totalPower
+}
+
+/*
+Zero padding for SNAC, pad 1:1 trailing
+*/
+func SnacPad(buf []float64) []float64 {
+	padded := make([]float64, len(buf)*2)
+	copy(padded, buf)
+	return padded
+}
+
+func SnacPadBuffer(buf *audio.IntBuffer) *audio.IntBuffer {
+	fSamples := BufferToFloat64(buf)
+	fPadded := SnacPad(fSamples)
+	return Float64ToBuffer(fPadded)
 }

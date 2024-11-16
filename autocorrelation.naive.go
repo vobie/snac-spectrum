@@ -34,7 +34,7 @@ func NaiveAutocorrelationNorm(buf *audio.IntBuffer) []float64 {
 	cumulativePowers := utils.CumulativeTotalPower(buf)
 
 	for shift := 0; shift < n; shift++ {
-		power := cumulativePowers[n-shift-1]
+		power := cumulativePowers[n-shift-1] //SNAC norm = norm[1] = norm[0] - (x2[0]+x2[N-1]).
 
 		var sum float64
 		for i := 0; i < slen-shift; i++ {
