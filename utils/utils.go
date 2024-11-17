@@ -13,6 +13,14 @@ func BufferToFloat64(buf *audio.IntBuffer) []float64 {
 	return fSamples
 }
 
+func IntToFloat64(samples []int) []float64 {
+	fSamples := make([]float64, len(samples))
+	for i, sample := range samples {
+		fSamples[i] = float64(sample)
+	}
+	return fSamples
+}
+
 func Float64ToBuffer(fSamples []float64) *audio.IntBuffer {
 	samples := make([]int, len(fSamples))
 	for i, fSample := range fSamples {
@@ -90,11 +98,10 @@ func PowerSpectrum(frequencySpectrum []complex128) []complex128 {
 /*
 Produces a series where cumulativeTotalPower[n] is the cumulative power in the input signal from input[0:n]
 */
-func CumulativeTotalPower(buf *audio.IntBuffer) []float64 {
-	cumulativePower := make([]float64, buf.NumFrames())
-	data := buf.Data
+func CumulativeTotalPower(samples []float64) []float64 {
+	cumulativePower := make([]float64, len(samples))
 	prev := float64(0)
-	for i, sample := range data {
+	for i, sample := range samples {
 		power := prev + float64(sample)*float64(sample)
 		cumulativePower[i] = power
 		prev = power

@@ -53,17 +53,17 @@ func main() {
 	// fmt.Printf("[naive] Ones autocorrelation:")
 	// fmt.Println(NaiveAutocorrelation(utils.MakeBuffer([]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}), 3))
 	fmt.Printf("[naive] Square(2samples) autocorrelation: \n")
-	fmt.Println(utils.NormalizeArray(NaiveAutocorrelation(utils.MakeBuffer(squareSignal))))
+	fmt.Println(utils.NormalizeArray(NaiveAutocorrelation(utils.IntToFloat64(squareSignal))))
 
 	// fmt.Printf("[optimized] Zeroes autocorrelation:")
 	// fmt.Println(OptimizedAutocorrelation(utils.MakeBuffer([]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0})))
 	// fmt.Printf("[optimized] Ones autocorrelation:")
 	// fmt.Println(OptimizedAutocorrelation(utils.MakeBuffer([]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1})))
-	fmt.Printf("[optimized] Square(2samples) autocorrelation: \n")
-	fmt.Println(utils.NormalizeArray(OptimizedAutocorrelation(utils.MakeBuffer(squareSignal))))
+	// fmt.Printf("[optimized] Square(2samples) autocorrelation: \n")
+	// fmt.Println(utils.NormalizeArray(OptimizedAutocorrelation(utils.IntToFloat64(squareSignal))))
 
 	// WAV stuff
-	file, err := os.Open("uneven_8192.wav")
+	file, err := os.Open("even_2period_8192.wav")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
@@ -86,11 +86,11 @@ func main() {
 	fmt.Printf("Buffer size: %d \n", slicedBuffer.NumFrames())
 
 	start := time.Now()
-	naive := NaiveAutocorrelationNorm(slicedBuffer)[:8100] // Skip very small shifts, error too big. TODO investigate what happens here.
+	naive := NaiveAutocorrelationNorm(utils.BufferToFloat64(slicedBuffer))[:16000] // Skip very small shifts, error too big. TODO investigate what happens here.
 	fmt.Printf("Naive: %v\n", time.Since(start))
 
 	start = time.Now()
-	opti := OptimizedAutocorrelationNorm(slicedBuffer) // ATTN: FFT WAY slower if frame size not divisible by 2
+	opti := OptimizedAutocorrelation(utils.BufferToFloat64(slicedBuffer)) // ATTN: FFT WAY slower if frame size not divisible by 2
 	fmt.Printf("Optimized: %v\n", time.Since(start))
 
 	naivePlot := plotAutocorrelation(naive, "Naive autocorrelation")

@@ -1,14 +1,12 @@
 package main
 
 import (
-	"github.com/go-audio/audio"
 	"github.com/vobie/snac-spectrum/utils"
 )
 
 // Naive algortihm: pointwise multiplication. For sanity checking more efficient power spectrum version.
-func NaiveAutocorrelation(buf *audio.IntBuffer) []float64 {
-	n := buf.NumFrames()
-	samples := utils.BufferToFloat64(buf)
+func NaiveAutocorrelation(samples []float64) []float64 {
+	n := len(samples)
 
 	result := make([]float64, n)
 	slen := len(samples)
@@ -25,16 +23,13 @@ func NaiveAutocorrelation(buf *audio.IntBuffer) []float64 {
 }
 
 // Naive algortihm: pointwise multiplication. For sanity checking more efficient power spectrum version.
-func NaiveAutocorrelationNorm(buf *audio.IntBuffer) []float64 {
-	n := buf.NumFrames()
-	samples := utils.BufferToFloat64(buf)
-
-	result := make([]float64, n)
+func NaiveAutocorrelationNorm(samples []float64) []float64 {
 	slen := len(samples)
-	cumulativePowers := utils.CumulativeTotalPower(buf)
+	result := make([]float64, slen)
+	cumulativePowers := utils.CumulativeTotalPower(samples)
 
-	for shift := 0; shift < n; shift++ {
-		power := cumulativePowers[n-shift-1] //SNAC norm = norm[1] = norm[0] - (x2[0]+x2[N-1]).
+	for shift := 0; shift < slen; shift++ {
+		power := cumulativePowers[slen-shift-1] //SNAC norm = norm[1] = norm[0] - (x2[0]+x2[N-1]).
 
 		var sum float64
 		for i := 0; i < slen-shift; i++ {
